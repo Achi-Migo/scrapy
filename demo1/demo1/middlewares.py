@@ -14,7 +14,7 @@ from scrapy.downloadermiddlewares.httpproxy import HttpProxyMiddleware
 from scrapy.exceptions import NotConfigured
 import json
 
-from demo1.demo1 import settings
+from scrapy.utils.project import get_project_settings
 
 
 class Demo1SpiderMiddleware:
@@ -146,16 +146,20 @@ class RandomHttpProxyMiddleware(HttpProxyMiddleware):
 
 
 class ProxyMiddleware(object):
-
     def process_request(self, request, spider):
-        proxy = random.choice(settings['PROXIES'])
-        request.meta['proxy'] = proxy
+        PROXIES = [
+            {'ip_port': '127.0.0.1:1080', 'schema': 'http'}
+        ]
+        proxy = random.choice(PROXIES)
+        request.meta['proxy'] = proxy['schema'] + "://" + proxy['ip_port']
 
 
 class UAMiddleware(object):
 
     def process_request(self, request, spider):
-        ua = random.choice(settings['USER_AGENT_LIST'])
+        settings = get_project_settings()
+        list_ = settings['USER_AGENT_LIST']
+        ua = random.choice(list_)
         request.headers['User-Agent'] = ua
 
 
