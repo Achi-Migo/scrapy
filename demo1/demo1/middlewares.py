@@ -14,7 +14,7 @@ from scrapy.downloadermiddlewares.httpproxy import HttpProxyMiddleware
 from scrapy.exceptions import NotConfigured
 import json
 
-from demo1.demo1 import settings
+from . import settings
 
 
 class Demo1SpiderMiddleware:
