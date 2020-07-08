@@ -13,6 +13,7 @@ error_ip = set()
 retry_url = []
 try_times = 0
 prefix = 'http://www.91porn.com/v.php'
+min_time = "03:00"
 
 
 class A91Spider(scrapy.Spider):
@@ -54,15 +55,21 @@ class A91Spider(scrapy.Spider):
                 r6 = r5[0].split("添加时间:")
                 item['add_time'] = r6[1].strip()
                 r7 = r6[0].split(" ")
-                item['title'] = r7[r7.__len__() - 1]
-                item['time'] = r6[0].replace(item['title'], "")
-
+                if r6[0].lower().startswith("hd"):
+                    item['time'] = r6[0][3:8]
+                    item['title'] = r6[0][8:]
+                else:
+                    item['time'] = r6[0][0:5]
+                    item['title'] = r6[0][5:]
+                if self.time_cmp(item['time'], min_time) < 0:
+                    continue
                 img = row.find(".img-responsive")
                 if img is not None:
                     item['img'] = img.attr('src')
                 else:
                     item['img'] = None
                 href = doc('.videos-text-align a').eq(0).attr("href")
+                item['cell_url'] = href
                 item['video_url'] = self.get_video_url(href)
                 yield item
             except Exception as e:
@@ -72,7 +79,9 @@ class A91Spider(scrapy.Spider):
         navs = doc(".pagingnav a")
         navs_eq = navs.eq(navs.length - 1)
         if navs_eq.text() == "»" and navs_eq.attr("href") is not None:
-            yield scrapy.Request(prefix + navs_eq.attr("href"), callback=self.parse)
+            print(prefix + navs_eq.attr("href"))
+            yield scrapy.Request(prefix + navs_eq.attr("href"), callback=self.parse,
+                                 meta={'proxy': random.choice(self.proxies_)}, cookies=self.cookies)
 
     def get_video_url(self, href):
         mget = self.mget(href)
@@ -115,3 +124,9 @@ class A91Spider(scrapy.Spider):
             error_ip.add(ip)
             raise
         return resp
+
+    def time_cmp(self, first_time, second_time):
+        print(first_time)
+        print(second_time)
+        return int(time.strftime("%M%S", time.strptime(first_time, "%M:%S"))) - int(
+            time.strftime("%M%S", time.strptime(second_time, "%M:%S")))

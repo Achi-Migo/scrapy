@@ -26,4 +26,5 @@ class a91Item(scrapy.Item):
     score = scrapy.Field()
     time = scrapy.Field()
     create_time = scrapy.Field()
-    video_url=scrapy.Field()
+    video_url = scrapy.Field()
+    cell_url = scrapy.Field()
