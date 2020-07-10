@@ -28,6 +28,8 @@ request = requests.Session()
 request.headers = utils.getHeader()
 request.verify = False
 
+ffmpeg = 'J:/Debug/ffmpeg/bin/ffmpeg.exe'
+
 
 # timeout=15
 
@@ -95,7 +97,7 @@ def merge(concatfile, name):
     try:
         path = cache_path + name + '.mp4'
         # command = 'ffmpeg -y -f concat -i %s -crf 18 -ar 48000 -vcodec libx264 -c:a aac -r 25 -g 25 -keyint_min 25 -strict -2 %s' % (concatfile, path)
-        command = 'J:/Debug/ffmpeg/bin/ffmpeg.exe -y -f concat -safe 0 -i %s -c copy %s' % (concatfile, path)
+        command = ffmpeg + ' -y -f concat -safe 0 -i %s -c copy %s' % (concatfile, path)
         # command = 'J:/Debug/ffmpeg/bin/ffmpeg.exe -y -f concat -i %s -bsf:a aac_adtstoasc -c copy %s' % (concatfile, path)
         os.system(command)
         print('视频合并完成')
@@ -201,12 +203,14 @@ def down_ts():
                     fp.close()
                 print("\r", '任务文件 ', l, ' 下载成功', end="", flush=True)
 
+
 def down_u3m8(u3m8, title):
     cmd = "J:/Debug/ffmpeg/bin/ffmpeg.exe -i " + u3m8 + " -n -c copy F:/大文件/avhub/" + title + ".mp4"
     print(cmd)
     p = os.popen(cmd)
     x = p.read()
     print(x)
+
 
 if __name__ == '__main__':
     # name = input('请输入视频名称：')
