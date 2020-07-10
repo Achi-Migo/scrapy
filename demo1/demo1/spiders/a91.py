@@ -3,6 +3,7 @@ import scrapy
 from scrapy.conf import settings
 import random
 from pyquery import PyQuery
+from . import utils
 from ..items import a91Item
 import execjs
 import time
@@ -13,14 +14,14 @@ error_ip = set()
 retry_url = []
 try_times = 0
 prefix = 'http://www.91porn.com/v.php'
-min_time = "03:00"
+min_time = "05:00"
 
 
 class A91Spider(scrapy.Spider):
     name = '91'
     allowed_domains = ['www.91porn.com']
     # start_urls = ['https://www.google.com/']
-    start_urls = ['http://www.91porn.com/v.php?next=watch']
+    start_urls = ['http://www.91porn.com/v.php?next=watch&page=2859']
 
     proxies_ = settings.get('PROXIES')
     max_page = 4698
@@ -33,12 +34,12 @@ class A91Spider(scrapy.Spider):
                                  meta={'proxy': random.choice(self.proxies_)}, cookies=self.cookies)
 
     def parse(self, response):
-        print(response.text)
+        # print(response.text)
         doc = PyQuery(response.text)
         rows = doc('.videos-text-align').items()
         for row in rows:
             try:
-                print(row.text())
+                # print(row.text())
 
                 split = row.text().strip()
                 item = a91Item()
@@ -61,7 +62,7 @@ class A91Spider(scrapy.Spider):
                 else:
                     item['time'] = r6[0][0:5]
                     item['title'] = r6[0][5:]
-                if self.time_cmp(item['time'], min_time) < 0:
+                if utils.time_cmp(item['time'], min_time) < 0:
                     continue
                 img = row.find(".img-responsive")
                 if img is not None:
@@ -69,13 +70,13 @@ class A91Spider(scrapy.Spider):
                 else:
                     item['img'] = None
                 href = doc('.videos-text-align a').eq(0).attr("href")
-                item['cell_url'] = href
                 item['video_url'] = self.get_video_url(href)
+                item['cell_url'] = href
                 yield item
             except Exception as e:
                 text = doc('span.pagingnav').text()
                 error_list.append(text)
-                print(e)
+                print("parse" + e.__str__())
         navs = doc(".pagingnav a")
         navs_eq = navs.eq(navs.length - 1)
         if navs_eq.text() == "»" and navs_eq.attr("href") is not None:
@@ -84,7 +85,9 @@ class A91Spider(scrapy.Spider):
                                  meta={'proxy': random.choice(self.proxies_)}, cookies=self.cookies)
 
     def get_video_url(self, href):
-        mget = self.mget(href)
+        mget = utils.mget(href)
+        if mget is None:
+            return ""
         doc = PyQuery(mget.text)
         split = doc('#player_one script').eq(0).text().replace("\"", "").split("(")[2].split(",")
         with open("D:\develop\Python\scrapy\demo1\demo1\spiders\md5.js", "r") as f:
@@ -96,37 +99,6 @@ class A91Spider(scrapy.Spider):
         tk = tk.call('strencode', split[0], split[1])  # 调用函数 token为js里面的函数  a为传的参数
         # tk = tk.call('strencode', a, b)  # 调用函数 token为js里面的函数  a为传的参数
         tk = str(tk).split('src=\'')[1].split("'")[0]
-        print('tk', tk)
+        # print('tk', tk)
         return tk
 
-    def random_ip(self):  # line:354:def method8():
-        OOOOOO0000000000O = random.randint(1, 255)  # line:355:a = random.randint(1, 255)
-        O0OOOO0OOO0OO0O0O = random.randint(1, 255)  # line:356:b = random.randint(1, 255)
-        O000O00000OOO00OO = random.randint(1, 255)  # line:357:c = random.randint(1, 255)
-        O0OOO000OOO0OO0OO = random.randint(1, 255)  # line:358:d = random.randint(1, 255)
-        gen_ip = str(OOOOOO0000000000O) + '.' + str(O0OOOO0OOO0OO0O0O) + '.' + str(O000O00000OOO00OO) + '.' + str(
-            O0OOO000OOO0OO0OO)
-        return gen_ip  # line:359:return str(a) + '.' + str(b) + '.' + str(c) + '.' + str(d)
-
-    def mget(self, url):
-        rand_time = random.randint(300, 500) / 1000
-        time.sleep(rand_time)
-        resp = None
-        try:
-            ip = self.random_ip()
-            headers = {'Accept-Language': 'zh-CN,zh;q=0.9',
-                       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36',
-                       'X-Forwarded-For': ip
-                       }
-            proxies = {'http': 'http://127.0.0.1:1080'}
-            resp = requests.get(url, headers=headers, proxies=proxies, timeout=10, verify=False)
-        except Exception:
-            error_ip.add(ip)
-            raise
-        return resp
-
-    def time_cmp(self, first_time, second_time):
-        print(first_time)
-        print(second_time)
-        return int(time.strftime("%M%S", time.strptime(first_time, "%M:%S"))) - int(
-            time.strftime("%M%S", time.strptime(second_time, "%M:%S")))

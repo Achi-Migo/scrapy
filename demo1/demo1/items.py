@@ -28,3 +28,13 @@ class a91Item(scrapy.Item):
     create_time = scrapy.Field()
     video_url = scrapy.Field()
     cell_url = scrapy.Field()
+
+class avhubItem(scrapy.Item):
+    # define the fields for your item here like:
+    title = scrapy.Field()
+    img = scrapy.Field()
+    views = scrapy.Field()
+    time = scrapy.Field()
+    create_time = scrapy.Field()
+    m3u8_url = scrapy.Field()
+    cell_url = scrapy.Field()

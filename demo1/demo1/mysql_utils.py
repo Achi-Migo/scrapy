@@ -8,6 +8,7 @@ db = "a91"
 charset = "utf8"
 
 ips = []
+num = 0
 
 
 # db = pymysql.connect(host=localhost, port=port, user=user, password=password, db=db, charset=charset);
@@ -56,19 +57,49 @@ def close_db():
 
 
 def insert_item(item, table_name):
+    rows_list = []
+    v = []
+    fields = item.keys()
+    for k in fields:
+        v.append(item.get(k))
+    rows_list.append(v)
+    if rows_list.__len__() == 0:
+        return 0
+    # ---------------------------------插入记录-----------------------------------------
+    sql = """
+            INSERT INTO `{table_name}` VALUES
+            """.format(table_name=table_name)
+
+    field = ""
+    for i in range(len(fields)):
+        field += ",'{}'"
+    aaa = "(null" + field + ")"
+    # print(aaa)
+    for row in rows_list:
+        if len(row) < 2:
+            continue
+        # value = "(null,'{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(*row)
+        value = aaa.format(*row)
+        sql += (value + ",")
+    sql = sql[:-1]
+    # ---------------------------------插入记录 结束-----------------------------------------
     try:
+        global num
         # 执行sql语句
-        # cursor.execute("DROP TABLE IF EXISTS {table_name} ;".format(table_name=table_name))
+
         check_db_connection()
-        sql = "insert into "+table_name+" values()"
-        num = cursor.execute(sql)
-        print(num)
+
+        print(sql)
+
+        cursor.execute(sql)
         # 提交到数据库执行
-        db.commit()
-        print("insert finished!")
+        num += 1
+        if num % 24 == 0:
+            db.commit()
+            print("insert finished!")
     except Exception as e:
         # 如果发生错误则回滚
-        print(e)
+        print("insert" + e)
         db.rollback()
 
 
@@ -77,17 +108,17 @@ def insert_list(fields, table_name, rows_list):
     if rows_list.__len__() == 0:
         return 0
     # ---------------------------------------创建表----------------------------------
-    tmp = ""
-    for s in fields:
-        # `title` varchar(100) DEFAULT NULL,
-        tmp += ("`{s}` varchar(255) DEFAULT NULL,".format(s=s))
-    creat_table = '''
-                        Create Table if Not Exists `{table_name}` (
-                        `id` bigint(255) NOT NULL AUTO_INCREMENT,
-                        {field}
-                        PRIMARY KEY (`id`)
-                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-                    '''.format(table_name=table_name, field=tmp)
+    # tmp = ""
+    # for s in fields:
+    #     # `title` varchar(100) DEFAULT NULL,
+    #     tmp += ("`{s}` varchar(255) DEFAULT NULL,".format(s=s))
+    # creat_table = '''
+    #                     Create Table if Not Exists `{table_name}` (
+    #                     `id` bigint(255) NOT NULL AUTO_INCREMENT,
+    #                     {field}
+    #                     PRIMARY KEY (`id`)
+    #                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+    #                 '''.format(table_name=table_name, field=tmp)
     # print(creat_table)
     # ----------------------------------------------------------------------------------
 
@@ -113,9 +144,9 @@ def insert_list(fields, table_name, rows_list):
         # 执行sql语句
         # cursor.execute("DROP TABLE IF EXISTS {table_name} ;".format(table_name=table_name))
         check_db_connection()
-        print(creat_table)
+        # print(creat_table)
         print(sql)
-        cursor.execute(creat_table)
+        # cursor.execute(creat_table)
         num = cursor.execute(sql)
         print(num)
         # 提交到数据库执行
@@ -126,17 +157,17 @@ def insert_list(fields, table_name, rows_list):
         print(e)
         db.rollback()
 
-    try:
-        check_db_connection()
-        # zakza_cursor.execute(creat_table)
-        # num = zakza_cursor.execute(sql)
-        print(num)
-        # zakza_db.commit()
-        # print("insert to zakza_db finished!")
-    except Exception as e:
-        # 如果发生错误则回滚
-        print(e)
-        # zakza_db.rollback()
+    # try:
+    # check_db_connection()
+    # zakza_cursor.execute(creat_table)
+    # num = zakza_cursor.execute(sql)
+    # print(num)
+    # zakza_db.commit()
+    # print("insert to zakza_db finished!")
+    # except Exception as e:
+    # 如果发生错误则回滚
+    # print(e)
+    # zakza_db.rollback()
 
 
 def test_db():

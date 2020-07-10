@@ -41,12 +41,9 @@ class MysqlPipeline(object):
 
     def process_item(self, item, spider):
         if spider.name == '91' and item is not None:
-            print(item)
-            l = []
-            v = []
-            keys = item.keys()
-            for k in keys:
-                v.append(item.get(k))
-            l.append(v)
-            mysql_utils.insert_list(keys, "91", l)
+            # print(item)
+            mysql_utils.insert_item(item, "91")
+        if spider.name == 'avhub' and item is not None:
+            # print(item)
+            mysql_utils.insert_item(item, "avhub")
         # mysql_utils.insert_item()
