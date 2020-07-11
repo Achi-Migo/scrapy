@@ -29,6 +29,7 @@ request.headers = utils.getHeader()
 request.verify = False
 
 ffmpeg = 'J:/Debug/ffmpeg/bin/ffmpeg.exe'
+dist_path = "/home/sync/cache"
 
 
 # timeout=15
@@ -206,10 +207,15 @@ def down_ts():
 
 def down_u3m8(u3m8, title):
     cmd = "J:/Debug/ffmpeg/bin/ffmpeg.exe -i " + u3m8 + " -n -c copy F:/大文件/avhub/" + title + ".mp4"
+    exec(cmd)
+
+
+def exec(cmd):
     print(cmd)
     p = os.popen(cmd)
     x = p.read()
     print(x)
+    return x
 
 
 if __name__ == '__main__':
@@ -225,10 +231,13 @@ if __name__ == '__main__':
     cache_list = []
     for f in os.listdir(cache_path):
         cache_list.append(f)
+    x: str = exec("ssh -p 1122 root@zakza.top:" + dist_path + " 'ls'")
+    for f in x.split("\n"):
+        cache_list.append(f)
 
-    for a in avhub_list:
-        title = str(a['title']).replace(" ", "")
-        if not cache_list.__contains__(title + ".mp4"):
-            down_u3m8(a['m3u8_url'], title)
+for a in avhub_list:
+    title = str(a['title']).replace(" ", "")
+    if not cache_list.__contains__(title + ".mp4"):
+        down_u3m8(a['m3u8_url'], title)
 
-    # down_ts()
+# down_ts()

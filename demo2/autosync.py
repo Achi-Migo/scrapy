@@ -1,6 +1,7 @@
 import os
 from apscheduler.schedulers.blocking import BlockingScheduler
 import time
+import datetime
 
 fixed = 60
 # fixed = 5
@@ -11,7 +12,7 @@ dist_path = "/home/sync/cache"
 
 def schedule():
     scheduler = BlockingScheduler()
-    scheduler.add_job(run, 'interval', seconds=fixed)
+    scheduler.add_job(run, 'interval', seconds=fixed, next_run_time=datetime.datetime.now())
 
     scheduler.start()
     print("init" + time.localtime().__str__())
@@ -22,7 +23,7 @@ def run():
     print("start:" + time.localtime().__str__())
     # time.sleep(16)
     wait_sync = []
-    with open(already_path, 'a')as already:
+    with open(already_path, 'a+')as already:
         read_lines = already.readlines()
 
         for f in os.listdir(cache_path):
