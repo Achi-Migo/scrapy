@@ -19,7 +19,6 @@ import time
 import requests
 from queue import Queue
 
-cache_path = 'F:/大文件/cache/'
 proxies = {'http': 'http://127.0.0.1:1080'}
 mer = False
 requests.packages.urllib3.disable_warnings()
@@ -28,8 +27,12 @@ request = requests.Session()
 request.headers = utils.getHeader()
 request.verify = False
 
-ffmpeg = 'J:/Debug/ffmpeg/bin/ffmpeg.exe'
-dist_path = "/home/sync/cache"
+# cache_path = 'F:/大文件/cache/'
+# ffmpeg = 'J:/Debug/ffmpeg/bin/ffmpeg.exe'
+
+cache_path = "~/down/scrapy/demo2/cache/"
+ffmpeg = 'ffmpeg '
+dist_path = "/home/sync/cache/"
 
 
 # timeout=15
@@ -206,7 +209,7 @@ def down_ts():
 
 
 def down_u3m8(u3m8, title):
-    cmd = "J:/Debug/ffmpeg/bin/ffmpeg.exe -i " + u3m8 + " -n -c copy F:/大文件/avhub/" + title + ".mp4"
+    cmd = ffmpeg + " -i " + u3m8 + " -n -c copy " + cache_path + title + ".mp4"
     exec(cmd)
 
 
@@ -231,9 +234,11 @@ if __name__ == '__main__':
     cache_list = []
     for f in os.listdir(cache_path):
         cache_list.append(f)
-    x: str = exec("ssh -p 1122 root@zakza.top:" + dist_path + " 'ls'")
-    for f in x.split("\n"):
-        cache_list.append(f)
+
+    if True:
+        x: str = exec("ssh -p 1122 root@zakza.top:" + dist_path + " 'ls'")
+        for f in x.split("\n"):
+            cache_list.append(f)
 
 for a in avhub_list:
     title = str(a['title']).replace(" ", "")
