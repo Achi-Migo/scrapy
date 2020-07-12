@@ -5,20 +5,27 @@ from scrapy.conf import settings
 base_url = "http://zakza.top:81/"
 cache_path = settings.get('cache_path')
 down_url_path = cache_path + "down_list.txt"
+already_path = cache_path + "already.txt"
 
 
 def gen():
     l = []
+    al = []
     for f in os.listdir(cache_path):
+        f.replace(" ", "")
         path_f = cache_path + f
         if os.path.exists(path_f) and f.endswith(".mp4"):
             if os.path.getsize(path_f) > 0:
                 l.append(base_url + f)
+                al.append(f)
             else:
                 os.remove(path_f)
     with open(down_url_path, 'w')as f:
         f.writelines(l)
         f.close()
+    with open(already_path, "w")as al:
+        al.writelines(l)
+        al.close()
     pass
 
 
