@@ -198,10 +198,31 @@ def select_url():
     return l
 
 
+def update_already(title, m3u8_url):
+    sql = """
+            insert into already(id,title,m3u8_url)values (null,'%s','%s')
+            """ % (title, m3u8_url)
+    # print(sql)
+    i=0
+    try:
+        # 执行sql语句
+        # cursor.execute("truncate table 91info")
+        print(sql)
+        check_db_connection()
+        i = cursor.execute(sql)
+        # 提交到数据库执行
+        print(i)
+        conn.commit()
+    except Exception as e:
+        # 如果发生错误则回滚
+        print(e)
+        conn.rollback()
+    return i
+
 def select_already():
     sql = """
-            SELECT distinct title,m3u8_url FROM already
-            """
+            SELECT distinct title form already
+        """
     # print(sql)
     try:
         # 执行sql语句
@@ -213,10 +234,7 @@ def select_already():
         l = []
         # print(result)
         for i in result:
-            temp = {}
-            temp['title'] = i[0]
-            temp['m3u8_url'] = i[1]
-            l.append(temp)
+            l.append(i[0])
         # 提交到数据库执行
         conn.commit()
     except Exception as e:
@@ -225,9 +243,9 @@ def select_already():
         conn.rollback()
     return l
 
-
-def test_db():
-    check_db_connection()
+if __name__ == '__main__':
+    # check_db_connection()
     # print(zakza_cursor.execute("select * from gzf_uer where id=1").__str__())
-    close_db()
-    return True
+    # close_db()
+    # return True
+    update_already('网袜长腿舞蹈系学妹，屁股真白，无套后入.mp4','111')
