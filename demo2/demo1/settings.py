@@ -39,7 +39,7 @@ COOKIES_ENABLED = False
 DEFAULT_REQUEST_HEADERS = {
     'Accept': '*/*',
     'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
-    'referer':'http://www.avbs5.xyz/china/'
+    'referer': 'http://www.avbs5.xyz/china/'
     # 'COOKIE': '__cfduid=d2c22fc666370a5daa032e19ba2b596371593839880; 91username=015fxjkaBlIFXus0oj4gPnRTMzvHRPY54NBfqK6%2FoVgDgP7Z; CLIPSHARE=fonasegd4fff9oi8k2gsdivmo3; DUID=d1f3ZC0cVsj9PebM%2BlDApPJo4bnhPjNH5RWcBVbu2iLq3hcD; USERNAME=8c73J4EL3k%2BxPfaDEP8FVZc%2Bx6xAe9VBAkMBKrjd4gTUexJZ; EMAILVERIFIED=no'
 }
 
@@ -112,5 +112,9 @@ import platform
 
 if platform.system().lower().startswith('win'):
     cache_path = 'F:/大文件/cache/'
+    mysql_host = "master"
+    mysql_port = 3306
 else:
     cache_path = "/var/www/html/"
+    mysql_host = "zakza.top"
+    mysql_port = 3306

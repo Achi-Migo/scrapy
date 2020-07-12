@@ -1,7 +1,9 @@
 import pymysql
+from scrapy.conf import settings
 
-localhost = "master"
-port = 3306
+localhost = settings.get('mysql_host')
+port = settings.get('mysql_port')
+
 user = "root"
 password = "123456"
 db = "a91"
@@ -203,7 +205,7 @@ def update_already(title, m3u8_url):
             insert into already(id,title,m3u8_url)values (null,'%s','%s')
             """ % (title, m3u8_url)
     # print(sql)
-    i=0
+    i = 0
     try:
         # 执行sql语句
         # cursor.execute("truncate table 91info")
@@ -218,6 +220,7 @@ def update_already(title, m3u8_url):
         print(e)
         conn.rollback()
     return i
+
 
 def select_already():
     sql = """
@@ -243,9 +246,10 @@ def select_already():
         conn.rollback()
     return l
 
+
 if __name__ == '__main__':
     # check_db_connection()
     # print(zakza_cursor.execute("select * from gzf_uer where id=1").__str__())
     # close_db()
     # return True
-    update_already('网袜长腿舞蹈系学妹，屁股真白，无套后入.mp4','111')
+    update_already('网袜长腿舞蹈系学妹，屁股真白，无套后入.mp4', '111')
