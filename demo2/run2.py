@@ -27,6 +27,7 @@ def ffmpeg_down():
     avhub_list = utils.select_url()
     cache_list = []
     for f in os.listdir(cache_path):
+        f = f.replace(" ", "")
         if f.endswith('.mp4') and os.path.getsize(cache_path + f) > 0:
             cache_list.append(f)
     for a in avhub_list:
