@@ -23,11 +23,12 @@ proxies = {'http': 'http://127.0.0.1:1080'}
 mer = False
 requests.packages.urllib3.disable_warnings()
 request = requests.Session()
-# request.proxies=proxies
+request.proxies = proxies
 request.headers = utils.getHeader()
 request.verify = False
 
-cache_path = 'F:/大文件/cache/'
+# cache_path = 'F:/大文件/cache/'
+cache_path = 'F:/大文件/avhub_idm/'
 # ffmpeg = 'J:/Debug/ffmpeg/bin/ffmpeg.exe'
 
 # cache_path = "~/down/scrapy/demo2/cache/"
@@ -41,7 +42,7 @@ dist_path = "/home/sync/cache/"
 # 预下载，获取m3u8文件，读出ts链接，并写入文档
 def down(url, base_url):
     # 当ts文件链接不完整时，需拼凑
-    resp = request.get(url)
+    resp = request.get(url, timeout=20)
     m3u8_text = resp.text
     for line in m3u8_text.split("\n"):
         if ".m3u8" in line:
@@ -50,7 +51,7 @@ def down(url, base_url):
                 m3u8_url = line
             else:
                 m3u8_url = base_url + line
-            m3u8_text = request.get(url=m3u8_url).text
+            m3u8_text = request.get(url=m3u8_url, timeout=20).text
             break
     # print(m3u8_text)
     # 按行拆分m3u8文档
@@ -83,11 +84,12 @@ def run(ts_queue, headers):
         url = ts_queue.get()
         filename = re.search('([a-zA-Z0-9-_]+.ts)', url).group(1).strip()
         try:
-            r = request.get(url)
+            r = request.get(url, timeout=20)
             with open(cache_path + filename, 'wb') as fp:
                 fp.write(r.content)
                 fp.close()
             print("\r", '任务文件 ', filename, ' 下载成功', end="", flush=True)
+
         except Exception as e:
             print("down ts file")
             print(e)
@@ -95,15 +97,23 @@ def run(ts_queue, headers):
             ts_queue.put(url)
 
 
+def exec(cmd):
+    print(cmd)
+    p = os.popen(cmd)
+    x = p.read()
+    print(x)
+    return x
+
+
 # 视频合并方法，使用ffmpeg
 def merge(concatfile, name):
     global mer
     try:
-        path = cache_path + name + '.mp4'
+        path = cache_path + name
         # command = 'ffmpeg -y -f concat -i %s -crf 18 -ar 48000 -vcodec libx264 -c:a aac -r 25 -g 25 -keyint_min 25 -strict -2 %s' % (concatfile, path)
         command = ffmpeg + ' -y -f concat -safe 0 -i %s -c copy %s' % (concatfile, path)
         # command = 'J:/Debug/ffmpeg/bin/ffmpeg.exe -y -f concat -i %s -bsf:a aac_adtstoasc -c copy %s' % (concatfile, path)
-        os.system(command)
+        exec(command)
         print('视频合并完成')
         mer = True
     except:
@@ -129,7 +139,10 @@ def remove():
         print('文件删除失败')
 
 
-def init(url, name):
+def init(url, name: str):
+    if not name.endswith(".mp4"):
+        name = name + '.mp4'
+
     playlist = "playlist.m3u8"
     if str(url).endswith(playlist):
         base_url = str(url).replace(playlist, "")
@@ -168,6 +181,7 @@ def init(url, name):
     print('写文件及下载耗时：' + str(end - start))
     merge(concatfile, name)
     remove()
+    utils.update_already(title, url)
     over = datetime.datetime.now().replace(microsecond=0)
     print('合并及删除文件耗时：' + str(over - end))
     print("所有任务结束")
@@ -185,7 +199,7 @@ def down_ts():
         base_url = str(url).replace(playlist, "")
     else:
         base_url = re.findall("https?://[^/]*/", url, re.I)[0]
-    resp = request.get(url)
+    resp = request.get(url, timeout=20)
     m3u8_text = resp.text
     for line in m3u8_text.split("\n"):
         if ".m3u8" in line:
@@ -201,16 +215,17 @@ def down_ts():
         for l in readlines:
             l = l.replace("\n", "").replace("file ", "")
             if not cache_list.__contains__(l):
-                r = request.get(base_url + l)
+                r = request.get(base_url + l, timeout=20)
                 with open(cache_path + l, 'wb') as fp:
                     fp.write(r.content)
                     fp.close()
                 print("\r", '任务文件 ', l, ' 下载成功', end="", flush=True)
 
 
-def down_u3m8(u3m8, title):
-    cmd = ffmpeg + " -i " + u3m8 + " -n -c copy " + cache_path + title + ".mp4"
+def down_m3u8(m3u8, title):
+    cmd = ffmpeg + " -i " + m3u8 + " -n -c copy " + cache_path + title
     exec(cmd)
+    utils.update_already(title, m3u8)
 
 
 def exec(cmd):
@@ -222,7 +237,7 @@ def exec(cmd):
 
 
 if __name__ == '__main__':
-    down_u3m8("https://video.huishenghuo888888.com/putong/20200425/GxJ93Kvb/index.m3u8","esu")
+    # down_m3u8("https://video.huishenghuo888888.com/putong/20200425/GxJ93Kvb/index.m3u8","esu")
     # name = input('请输入视频名称：')
     # url = input('请输入视频链接：').strip()
     # 测试用链接：https://yiyi.55zuiday.com/ppvod/70B5A6E3A150A99882E28EC793CAF519.m3u8
@@ -231,20 +246,21 @@ if __name__ == '__main__':
     # merge(cache_path+"s.txt","esu")
     # remove()
 
-    # avhub_list = utils.select_url()
-    # cache_list = []
-    # for f in os.listdir(cache_path):
-    #     if os.path.getsize(cache_path + f) > 0:
-    #         cache_list.append(f)
-    #
-    # if True:
-    #     x: str = exec("ssh -p 1122 root@zakza.top 'cd " + dist_path + ";ls'")
-    #     for f in x.split("\n"):
-    #         cache_list.append(f)
-    #
-    # for a in avhub_list:
-    #     title = str(a['title']).replace(" ", "")
-    #     if not cache_list.__contains__(title + ".mp4"):
-    #         down_u3m8(a['m3u8_url'], title)
+    avhub_list = utils.select_url()
+    while True:
+        if avhub_list.__len__() == 0:
+            break
+
+        cache_list = []
+        for f in os.listdir(cache_path):
+            f = f.replace(" ", "")
+            if f.endswith('.mp4') and os.path.getsize(cache_path + f) > 0:
+                cache_list.append(f)
+        avhub_list = utils.select_url()
+        for a in avhub_list:
+            title = a['title']
+            if not cache_list.__contains__(title):
+                down_m3u8(a['m3u8_url'], title)
+                break
 
 # down_ts()
