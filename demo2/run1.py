@@ -27,10 +27,10 @@ request = requests.Session()
 request.headers = utils.getHeader()
 request.verify = False
 
-# cache_path = 'F:/大文件/cache/'
+cache_path = 'F:/大文件/cache/'
 # ffmpeg = 'J:/Debug/ffmpeg/bin/ffmpeg.exe'
 
-cache_path = "~/down/scrapy/demo2/cache/"
+# cache_path = "~/down/scrapy/demo2/cache/"
 ffmpeg = 'ffmpeg '
 dist_path = "/home/sync/cache/"
 
@@ -222,27 +222,29 @@ def exec(cmd):
 
 
 if __name__ == '__main__':
+    down_u3m8("https://video.huishenghuo888888.com/putong/20200425/GxJ93Kvb/index.m3u8","esu")
     # name = input('请输入视频名称：')
     # url = input('请输入视频链接：').strip()
     # 测试用链接：https://yiyi.55zuiday.com/ppvod/70B5A6E3A150A99882E28EC793CAF519.m3u8
     # 链接电影：地球最后的夜晚
-    # init("https://video.huishenghuo888888.com/putong/20200628/QvaSnzU6/500kb/hls/index.m3u8", "lanse")
-    # merge(cache_path+"s.txt","lanse")
+    # init("https://video.huishenghuo888888.com/putong/20200425/GxJ93Kvb/index.m3u8", "esu")
+    # merge(cache_path+"s.txt","esu")
     # remove()
 
-    avhub_list = utils.select_url()
-    cache_list = []
-    for f in os.listdir(cache_path):
-        cache_list.append(f)
-
-    if True:
-        x: str = exec("ssh -p 1122 root@zakza.top:" + dist_path + " 'ls'")
-        for f in x.split("\n"):
-            cache_list.append(f)
-
-for a in avhub_list:
-    title = str(a['title']).replace(" ", "")
-    if not cache_list.__contains__(title + ".mp4"):
-        down_u3m8(a['m3u8_url'], title)
+    # avhub_list = utils.select_url()
+    # cache_list = []
+    # for f in os.listdir(cache_path):
+    #     if os.path.getsize(cache_path + f) > 0:
+    #         cache_list.append(f)
+    #
+    # if True:
+    #     x: str = exec("ssh -p 1122 root@zakza.top 'cd " + dist_path + ";ls'")
+    #     for f in x.split("\n"):
+    #         cache_list.append(f)
+    #
+    # for a in avhub_list:
+    #     title = str(a['title']).replace(" ", "")
+    #     if not cache_list.__contains__(title + ".mp4"):
+    #         down_u3m8(a['m3u8_url'], title)
 
 # down_ts()

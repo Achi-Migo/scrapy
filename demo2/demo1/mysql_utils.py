@@ -172,7 +172,35 @@ def insert_list(fields, table_name, rows_list):
 
 def select_url():
     sql = """
-            SELECT distinct title,m3u8_url FROM avhub
+            SELECT distinct CONCAT(a.title,'.mp4') title,a.m3u8_url FROM avhub a LEFT JOIN already b on CONCAT(a.title,'.mp4')=b.title WHERE b.title is null
+        """
+    # print(sql)
+    try:
+        # 执行sql语句
+        # cursor.execute("truncate table 91info")
+        print(sql)
+        check_db_connection()
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        l = []
+        # print(result)
+        for i in result:
+            temp = {}
+            temp['title'] = i[0]
+            temp['m3u8_url'] = i[1]
+            l.append(temp)
+        # 提交到数据库执行
+        conn.commit()
+    except Exception as e:
+        # 如果发生错误则回滚
+        print(e)
+        conn.rollback()
+    return l
+
+
+def select_already():
+    sql = """
+            SELECT distinct title,m3u8_url FROM already
             """
     # print(sql)
     try:

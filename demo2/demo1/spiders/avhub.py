@@ -15,14 +15,18 @@ min_time = '03:00'
 class AvhubSpider(scrapy.Spider):
     name = 'avhub'
     allowed_domains = ['www.avbs5.xyz']
-    start_urls = ['http://www.avbs5.xyz/china']
+    start_urls = ['http://www.avbs5.xyz/china/']
     proxies_ = settings.get('PROXIES')
     cookies = settings.get("COOKIES")
 
     def start_requests(self):
         for url in self.start_urls:
-            yield scrapy.Request(url=url, callback=self.parse, headers=utils.getHeader(),
-                                 meta={'proxy': random.choice(self.proxies_)}, cookies=self.cookies)
+            yield scrapy.Request(url=url
+                                 , callback=self.parse
+                                 , headers=utils.getHeader()
+                                 ,meta={'proxy': random.choice(self.proxies_)}
+                                 # , cookies=self.cookies
+                                 )
 
     def parse(self, response):
         # print(response.text)
@@ -34,7 +38,7 @@ class AvhubSpider(scrapy.Spider):
                 item['time'] = row.find('.badge').text()
                 if utils.time_cmp(item['time'], min_time) < 0:
                     continue
-                item['title'] = row.find('.video-title').text()
+                item['title'] = row.find('.video-title').text().replace(" ","")
                 item['views'] = row.find('.video-details').text()
                 item['img'] = row.find('img').attr('src')
 
@@ -50,8 +54,11 @@ class AvhubSpider(scrapy.Spider):
         next_href = p.eq(p.length - 1).attr('href')
         if next_href is not None:
             print(prefix + next_href)
-            yield scrapy.Request(prefix + next_href, callback=self.parse, headers=utils.getHeader(),
-                                 meta={'proxy': random.choice(self.proxies_)})
+            yield scrapy.Request(prefix + next_href
+                                 , callback=self.parse
+                                 , headers=utils.getHeader()
+                                 ,meta={'proxy': random.choice(self.proxies_)}
+                                 )
 
     def get_video_url(self, href):
         mget = utils.mget(href)

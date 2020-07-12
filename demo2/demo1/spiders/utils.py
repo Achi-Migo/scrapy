@@ -18,7 +18,7 @@ def random_ip():  # line:354:def method8():
 
 
 def mget(url):
-    rand_time = random.randint(200, 300) / 1000
+    rand_time = random.randint(200, 400) / 1000
     time.sleep(rand_time)
     resp = None
     try:
@@ -28,7 +28,11 @@ def mget(url):
                    'X-Forwarded-For': ip
                    }
         proxies = {'http': 'http://127.0.0.1:1080'}
-        resp = requests.get(url, headers=headers, proxies=proxies, timeout=10, verify=False)
+        resp = requests.get(url
+                            , headers=headers
+                            , proxies=proxies
+                            # , timeout=10
+                            , verify=False)
     except Exception as e:
         print("mget" + e.__str__())
         raise
