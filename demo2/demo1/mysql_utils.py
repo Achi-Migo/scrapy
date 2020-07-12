@@ -1,8 +1,7 @@
 import pymysql
 from scrapy.conf import settings
 
-localhost = settings.get('mysql_host')
-port = settings.get('mysql_port')
+from demo1.settings import *
 
 user = "root"
 password = "123456"
@@ -28,7 +27,7 @@ cursor = None
 def init_db():
     global conn, cursor
     try:
-        conn = pymysql.connect(host=localhost, port=port, user=user, password=password, db=db,
+        conn = pymysql.connect(host=mysql_host, port=mysql_port, user=user, password=password, db=db,
                                charset=charset);
         conn.connect_timeout = 3000
         cursor = conn.cursor()
@@ -200,10 +199,10 @@ def select_url():
     return l
 
 
-def update_already(title, m3u8_url):
+def update_already(title, m3u8_url, state=200):
     sql = """
-            insert into already(id,title,m3u8_url)values (null,'%s','%s')
-            """ % (title, m3u8_url)
+            insert into already(id,title,m3u8_url,state)values (null,'%s','%s',%s)
+            """ % (title, m3u8_url, state)
     # print(sql)
     i = 0
     try:

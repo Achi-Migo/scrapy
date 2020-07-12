@@ -1,8 +1,8 @@
 import os
 from demo1.spiders import utils
 from scrapy.conf import settings
+from demo1.settings import *
 
-cache_path = settings.get('cache_path')
 ffmpeg = 'ffmpeg '
 
 
@@ -11,8 +11,11 @@ def down_m3u8(m3u8, title):
         if f == title:
             return
     cmd = ffmpeg + " -i " + m3u8 + " -n -c copy " + cache_path + title
-    exec(cmd)
-    utils.update_already(title, m3u8)
+    x = exec(cmd)
+    if str(x).__contains__('HTTP error 404 Not Found'):
+        utils.update_already(title, m3u8,404)
+    else:
+        utils.update_already(title, m3u8)
 
 
 def exec(cmd):
