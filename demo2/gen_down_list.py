@@ -23,7 +23,7 @@ def gen():
     with open(down_url_path, 'w')as f:
         f.writelines(l)
         f.close()
-    with open(already_path, "w")as f:
+    with open(already_path, "a")as f:
         f.writelines(al)
         f.close()
     pass
