@@ -29,10 +29,16 @@ def gen():
     pass
 
 
-def remove(names):
-    for name in names:
-        if name.endswith(".mp4") and os.path.exists(cache_path + name):
-            os.remove(cache_path + name)
+def remove():
+    # for name in names:
+    #     if name.endswith(".mp4") and os.path.exists(cache_path + name):
+    #         os.remove(cache_path + name)
+    with open(already_path, "r")as f:
+        readlines = f.readlines()
+        for name in readlines:
+            name = name.replace("\n", "")
+            if os.path.exists(cache_path + name):
+                os.remove(cache_path + name)
 
 
 def rename():
