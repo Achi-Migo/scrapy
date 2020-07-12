@@ -110,9 +110,9 @@ USER_AGENT_LIST = [
 HTTPERROR_ALLOWED_CODES = [502, 403]
 import platform
 
-
 if platform.system().lower().startswith('win'):
-    cache_path = 'F:/大文件/cache/'
+    # cache_path = 'F:/大文件/cache/'
+    cache_path = 'F:/大文件/avhub_idm/'
     mysql_host = "master"
     mysql_port = 3306
 else:

@@ -1,9 +1,8 @@
 import os
 from demo1.mysql_utils import select_already
-from scrapy.conf import settings
+from demo1.settings import *
 
 base_url = "http://zakza.top:81/"
-cache_path = settings.get('cache_path')
 down_url_path = cache_path + "down_list.txt"
 already_path = cache_path + "already.txt"
 
@@ -16,6 +15,7 @@ def gen():
         path_f = cache_path + f
         if os.path.exists(path_f) and f.endswith(".mp4"):
             if os.path.getsize(path_f) > 0:
+                f = f + '\n'
                 l.append(base_url + f)
                 al.append(f)
             else:
@@ -23,9 +23,9 @@ def gen():
     with open(down_url_path, 'w')as f:
         f.writelines(l)
         f.close()
-    with open(already_path, "w")as al:
-        al.writelines(l)
-        al.close()
+    with open(already_path, "w")as f:
+        f.writelines(al)
+        f.close()
     pass
 
 
