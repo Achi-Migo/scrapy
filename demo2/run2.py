@@ -1,11 +1,8 @@
 import os
 from demo1.spiders import utils
-import platform
+from scrapy.conf import settings
 
-if platform.system().lower().startswith('win'):
-    cache_path = 'F:/大文件/cache/'
-else:
-    cache_path = "/var/www/html/"
+cache_path = settings.get('cache_path')
 ffmpeg = 'ffmpeg '
 
 

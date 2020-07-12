@@ -108,3 +108,9 @@ USER_AGENT_LIST = [
 ]
 
 HTTPERROR_ALLOWED_CODES = [502, 403]
+import platform
+
+if platform.system().lower().startswith('win'):
+    cache_path = 'F:/大文件/cache/'
+else:
+    cache_path = "/var/www/html/"
