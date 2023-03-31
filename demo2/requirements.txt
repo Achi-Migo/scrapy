@@ -1,5 +1,5 @@
 PyExecJS==1.5.1
-redis==2.10.5
+redis==4.4.4
 PyMySQL==0.7.10
 pyquery==1.2.17
 itemadapter==0.1.0
